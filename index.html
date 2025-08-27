@@ -4,22 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Evidence-based sleep therapy tool for tinnitus management by Tinnitus Centres">
-    <title>Quiet Nights - Sleep & Tinnitus Tool | Tinnitus Centres</title>
+    <title>QuietNights - Sleep & Tinnitus Tool | Tinnitus Centres</title>
     
-    <!-- External Dependencies -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
-    
-    <!-- Inline Critical CSS for Fast Load -->
     <style>
         :root {
             --primary: #0ea9c7;
             --secondary: #0a4c7c;
+            --accent: #662d91;
             --success: #4caf50;
             --warning: #ff9800;
             --danger: #f44336;
             --dark: #2c3e50;
             --light: #ecf0f1;
             --white: #ffffff;
+            --background: #c6dee7;
         }
 
         * {
@@ -30,7 +28,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0ea9c7 0%, #0a4c7c 100%);
             min-height: 100vh;
             color: var(--dark);
         }
@@ -41,7 +39,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0ea9c7 0%, #0a4c7c 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -53,6 +51,7 @@
         .loading-screen h1 {
             color: white;
             margin-bottom: 20px;
+            font-size: 2.5em;
         }
 
         .loader {
@@ -86,9 +85,14 @@
             padding: 20px 30px;
             margin-bottom: 30px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .logo {
@@ -111,12 +115,12 @@
         /* Main Layout Grid */
         .main-grid {
             display: grid;
-            grid-template-columns: 1fr 2fr 1fr;
+            grid-template-columns: 1fr 300px;
             gap: 20px;
             margin-bottom: 30px;
         }
 
-        @media (max-width: 1024px) {
+        @media (max-width: 1200px) {
             .main-grid {
                 grid-template-columns: 1fr;
             }
@@ -137,51 +141,21 @@
             font-weight: 600;
         }
 
-        /* Assessment Panel */
-        .assessment-panel {
-            grid-column: 1;
-        }
-
-        .rating-group {
-            margin-bottom: 25px;
-        }
-
-        .rating-label {
-            display: block;
-            color: var(--dark);
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
-
-        .rating-slider {
-            width: 100%;
-            margin: 10px 0;
-        }
-
-        .rating-value {
-            display: inline-block;
-            background: var(--primary);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-
         /* Sound Control Panel */
         .sound-panel {
-            grid-column: 2;
+            grid-column: 1;
         }
 
         .master-controls {
             display: flex;
             gap: 15px;
             margin-bottom: 30px;
-            align-items: center;
+            align-items: stretch;
         }
 
         .play-btn {
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: none;
@@ -190,42 +164,187 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
+            font-size: 2em;
+            box-shadow: 0 4px 15px rgba(14,169,199,0.3);
+            flex-shrink: 0;
         }
 
         .play-btn:hover {
             transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(14,169,199,0.4);
+        }
+
+        .play-btn:active {
+            transform: scale(0.98);
         }
 
         .play-btn.playing {
-            background: linear-gradient(135deg, var(--danger), #c62828);
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
         }
 
-        .master-volume {
+        /* Enhanced Master Volume for Mobile */
+        .master-volume-enhanced {
             flex: 1;
+            background: var(--light);
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .volume-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .volume-value-badge {
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 18px;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .volume-control-wrapper {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .enhanced-slider {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: #ddd;
+            -webkit-appearance: none;
+        }
+
+        .enhanced-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .enhanced-slider::-moz-range-thumb {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .volume-step-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-weight: bold;
+        }
+
+        .volume-step-btn:hover {
+            background: var(--secondary);
+            transform: scale(1.1);
+        }
+
+        .volume-step-btn:active {
+            transform: scale(0.95);
+        }
+
+        .volume-quick-presets {
+            display: flex;
+            gap: 8px;
+            justify-content: space-between;
+        }
+
+        .volume-preset {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .volume-preset:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: none;
         }
 
         .presets {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             margin-bottom: 30px;
         }
 
         .preset-btn {
-            flex: 1;
-            padding: 10px;
+            padding: 12px;
             border: 2px solid var(--primary);
             background: white;
             color: var(--primary);
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
+            font-weight: 500;
         }
 
-        .preset-btn:hover, .preset-btn.active {
+        .preset-btn:hover {
+            background: var(--background);
+            transform: translateY(-2px);
+        }
+
+        .preset-btn.active {
             background: var(--primary);
             color: white;
         }
@@ -233,57 +352,81 @@
         /* Sound Layers */
         .sound-layers {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 20px;
         }
 
+        @media (max-width: 768px) {
+            .sound-layers {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
         .layer-control {
-            background: var(--light);
-            border-radius: 10px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e6f7ff 100%);
+            border-radius: 12px;
             padding: 20px;
             text-align: center;
+            border: 1px solid rgba(14,169,199,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .layer-control:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .layer-control.muted {
+            opacity: 0.5;
+            background: #f0f0f0;
         }
 
         .layer-name {
             font-weight: 600;
             color: var(--secondary);
             margin-bottom: 10px;
+            font-size: 1.1em;
         }
 
         .layer-icon {
-            font-size: 2em;
+            font-size: 2.5em;
             margin-bottom: 15px;
         }
 
-        .volume-slider {
-            writing-mode: bt-lr; /* IE */
-            -webkit-appearance: slider-vertical; /* WebKit */
-            width: 30px;
-            height: 150px;
-            margin: 0 auto 15px;
-            cursor: pointer;
+        .layer-volume-control {
+            margin: 20px 0;
         }
 
-        .volume-label {
-            background: var(--secondary);
+        .volume-display {
+            display: inline-block;
+            background: var(--primary);
             color: white;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 0.9em;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+            min-width: 60px;
         }
 
-        .layer-mute {
+        .layer-toggle {
+            width: 100%;
+            padding: 8px;
             margin-top: 10px;
-            padding: 5px 15px;
-            border: 1px solid var(--secondary);
+            border: 2px solid var(--primary);
             background: white;
-            color: var(--secondary);
-            border-radius: 5px;
+            color: var(--primary);
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s;
+            font-weight: 500;
         }
 
-        .layer-mute.muted {
+        .layer-toggle:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .layer-toggle.muted {
             background: var(--danger);
             color: white;
             border-color: var(--danger);
@@ -292,90 +435,81 @@
         /* Timer Section */
         .timer-section {
             margin-top: 30px;
-            padding: 20px;
-            background: var(--light);
-            border-radius: 10px;
+            padding: 25px;
+            background: linear-gradient(135deg, #fff8f0 0%, #ffe6e6 100%);
+            border-radius: 12px;
+            border: 1px solid rgba(255,152,0,0.2);
         }
 
         .timer-options {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
             gap: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .timer-btn {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid var(--primary);
+            padding: 10px;
+            border: 2px solid var(--warning);
             background: white;
-            color: var(--primary);
-            border-radius: 5px;
+            color: var(--warning);
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .timer-btn:hover {
+            background: #fff3e0;
         }
 
         .timer-btn.active {
-            background: var(--primary);
+            background: var(--warning);
             color: white;
         }
 
         .timer-display {
             text-align: center;
-            font-size: 2em;
+            font-size: 2.5em;
             color: var(--secondary);
             font-weight: bold;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
         }
 
         /* Techniques Panel */
         .techniques-panel {
-            grid-column: 3;
+            grid-column: 2;
         }
 
         .technique-card {
-            background: var(--light);
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 15px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(102,45,145,0.2);
         }
 
         .technique-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(102,45,145,0.2);
         }
 
         .technique-title {
             font-weight: 600;
-            color: var(--secondary);
+            color: var(--accent);
             margin-bottom: 5px;
         }
 
         .technique-duration {
-            color: var(--primary);
+            color: #666;
             font-size: 0.9em;
         }
 
-        .video-container {
-            display: none;
-            margin-top: 15px;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-        }
-
-        .video-container.active {
-            display: block;
-        }
-
-        /* Data Collection Form */
-        .data-form {
-            background: rgba(255,255,255,0.98);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-
+        /* Form Elements */
         .form-group {
             margin-bottom: 20px;
         }
@@ -411,11 +545,12 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
         }
 
         .submit-btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(14,169,199,0.3);
         }
 
         .submit-btn:disabled {
@@ -437,54 +572,165 @@
 
         .success-message.show {
             display: block;
+            animation: slideIn 0.5s ease;
         }
 
-        /* Visual Feedback */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Visualizer */
         .visualizer {
-            height: 60px;
-            background: var(--light);
-            border-radius: 8px;
+            height: 80px;
+            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+            border-radius: 10px;
             margin: 20px 0;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 3px;
+            padding: 10px;
         }
 
-        .bar {
-            width: 4px;
-            background: var(--primary);
+        .visualizer-bar {
+            width: 3px;
+            background: linear-gradient(to top, var(--primary), var(--accent));
             border-radius: 2px;
-            transition: height 0.1s ease;
+            transition: height 0.2s ease;
+            min-height: 5px;
+        }
+
+        /* Email Modal Styles */
+        .email-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .email-modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .secondary-btn {
+            flex: 1;
+            padding: 15px;
+            background: #666;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
         }
 
         /* Mobile Responsive */
         @media (max-width: 768px) {
-            .sound-layers {
-                grid-template-columns: 1fr 1fr;
+            .enhanced-slider {
+                height: 10px;
+            }
+            
+            .enhanced-slider::-webkit-slider-thumb,
+            .enhanced-slider::-moz-range-thumb {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .volume-step-btn {
+                width: 48px;
+                height: 48px;
+                font-size: 28px;
+            }
+            
+            .master-volume-enhanced {
+                padding: 15px;
+            }
+            
+            .volume-quick-presets {
+                margin-top: 12px;
             }
 
-            .volume-slider {
-                height: 120px;
+            .presets {
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .timer-options {
-                flex-wrap: wrap;
+                grid-template-columns: repeat(3, 1fr);
             }
 
             .header-content {
                 flex-direction: column;
-                gap: 20px;
+                text-align: center;
             }
+
+            .main-grid {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .sound-layers {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Error Message */
+        .error-message {
+            background: #fee;
+            color: var(--danger);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid var(--danger);
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Audio Source Info */
+        .audio-source-info {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #666;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <!-- Last updated: 2025-08-25 12:30 -->
-    
     <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
-        <h1>🎧 Quiet Nights</h1>
+        <img src="https://image.jimcdn.com/app/cms/image/transf/none/path/s960b7fc6030ac054/image/ia85c92eb1d04ab76/version/1648189187/image.png" 
+             alt="Tinnitus Centres Logo" 
+             style="width: 150px; margin-bottom: 20px;">
+        <h1>QuietNights</h1>
         <div class="loader"></div>
         <p style="color: white; margin-top: 20px;">Preparing your sleep therapy session...</p>
     </div>
@@ -493,133 +739,114 @@
     <div class="container" id="mainContainer">
         <!-- Header -->
         <header>
-            <div class="logo">🎧 Tinnitus Centres - Quiet Nights Tool</div>
-            <div class="session-info">
-                <span class="session-timer">Session Time: <span id="sessionTime">00:00</span></span>
-                <span style="color: var(--primary);">Evidence-Based Sleep Therapy</span>
+            <div class="header-content">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <img src="https://image.jimcdn.com/app/cms/image/transf/none/path/s960b7fc6030ac054/image/ia85c92eb1d04ab76/version/1648189187/image.png" 
+                         alt="Tinnitus Centres" 
+                         style="height: 40px;">
+                    <div class="logo">QuietNights</div>
+                </div>
+                <div class="session-info">
+                    <span class="session-timer">Session: <span id="sessionTime">00:00</span></span>
+                    <span style="color: var(--primary);">Evidence-Based Sleep Therapy</span>
+                </div>
             </div>
         </header>
 
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage"></div>
+
         <!-- Main Grid Layout -->
         <div class="main-grid">
-            <!-- Left Panel: Assessment -->
-            <div class="assessment-panel">
-                <div class="card">
-                    <h2 class="card-title">📊 Quick Assessment</h2>
-                    
-                    <div class="rating-group">
-                        <label class="rating-label">Tinnitus Intensity</label>
-                        <input type="range" class="rating-slider" id="tinnitusRating" min="1" max="10" value="5">
-                        <span class="rating-value" id="tinnitusValue">5</span>
-                    </div>
-
-                    <div class="rating-group">
-                        <label class="rating-label">Stress Level</label>
-                        <input type="range" class="rating-slider" id="stressRating" min="1" max="10" value="5">
-                        <span class="rating-value" id="stressValue">5</span>
-                    </div>
-
-                    <div class="rating-group">
-                        <label class="rating-label">Sleep Readiness</label>
-                        <input type="range" class="rating-slider" id="sleepRating" min="1" max="10" value="5">
-                        <span class="rating-value" id="sleepValue">5</span>
-                    </div>
-
-                    <button class="preset-btn" style="width: 100%; margin-top: 20px;" onclick="saveAssessment()">
-                        💾 Save Assessment
-                    </button>
-                </div>
-
-                <!-- User Info Form -->
-                <div class="card" style="margin-top: 20px;">
-                    <h2 class="card-title">📧 Track Progress</h2>
-                    <div class="form-group">
-                        <label class="form-label">Email (optional)</label>
-                        <input type="email" class="form-input" id="userEmail" placeholder="your@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">First Name</label>
-                        <input type="text" class="form-input" id="userName" placeholder="Your name">
-                    </div>
-                    <button class="submit-btn" onclick="saveUserData()">
-                        Send Session Summary
-                    </button>
-                    <div class="success-message" id="successMsg">
-                        ✅ Session saved! Check your email.
-                    </div>
-                </div>
-            </div>
-
             <!-- Center Panel: Sound Controls -->
             <div class="sound-panel">
                 <div class="card">
                     <h2 class="card-title">🎵 Sound Therapy Console</h2>
                     
-                    <!-- Master Controls -->
+                    <!-- Enhanced Master Controls -->
                     <div class="master-controls">
                         <button class="play-btn" id="playBtn" onclick="togglePlayback()">
                             <span id="playIcon">▶</span>
                         </button>
-                        <div class="master-volume">
-                            <span>Master Volume:</span>
-                            <input type="range" id="masterVolume" min="0" max="100" value="70" style="flex: 1;">
-                            <span id="masterVolumeValue">70%</span>
+                        <div class="master-volume-enhanced">
+                            <div class="volume-header">
+                                <span style="font-weight: 600; color: var(--secondary);">Master Volume</span>
+                                <span id="masterVolumeValue" class="volume-value-badge">70%</span>
+                            </div>
+                            <div class="volume-control-wrapper">
+                                <button class="volume-step-btn" onclick="adjustMasterVolume(-10)">−</button>
+                                <input type="range" id="masterVolume" min="0" max="100" value="70" 
+                                       class="enhanced-slider">
+                                <button class="volume-step-btn" onclick="adjustMasterVolume(10)">+</button>
+                            </div>
+                            <div class="volume-quick-presets">
+                                <button class="volume-preset" onclick="setMasterVolumePreset(25)">25%</button>
+                                <button class="volume-preset" onclick="setMasterVolumePreset(50)">50%</button>
+                                <button class="volume-preset" onclick="setMasterVolumePreset(75)">75%</button>
+                                <button class="volume-preset" onclick="setMasterVolumePreset(100)">100%</button>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Visualizer -->
-                    <div class="visualizer" id="visualizer">
-                        <!-- Bars will be added dynamically -->
-                    </div>
+                    <div class="visualizer" id="visualizer"></div>
 
                     <!-- Presets -->
                     <div class="presets">
                         <button class="preset-btn" onclick="loadPreset('gentle')">Gentle Night</button>
                         <button class="preset-btn" onclick="loadPreset('deep')">Deep Sleep</button>
                         <button class="preset-btn" onclick="loadPreset('active')">Active Mind</button>
-                        <button class="preset-btn" onclick="loadPreset('custom')">Custom</button>
+                        <button class="preset-btn" onclick="loadPreset('custom')">Custom Mix</button>
                     </div>
 
                     <!-- Sound Layers -->
                     <div class="sound-layers">
                         <!-- Foundation Layer -->
-                        <div class="layer-control">
+                        <div class="layer-control" data-layer="foundation">
                             <div class="layer-icon">🌊</div>
-                            <div class="layer-name">Foundation</div>
-                            <input type="range" class="volume-slider" id="foundationVolume" 
-                                   min="0" max="100" value="70" orient="vertical">
-                            <div class="volume-label" id="foundationLabel">70%</div>
-                            <button class="layer-mute" onclick="toggleMute('foundation')">Mute</button>
+                            <div class="layer-name">Pink Noise</div>
+                            <div class="layer-volume-control">
+                                <input type="range" class="layer-volume-slider" 
+                                       id="foundationVolume" min="0" max="100" value="70">
+                                <div class="volume-display" id="foundationLabel">70%</div>
+                            </div>
+                            <button class="layer-toggle" onclick="toggleLayer('foundation')">Mute</button>
                         </div>
 
                         <!-- Nature Layer -->
-                        <div class="layer-control">
+                        <div class="layer-control" data-layer="nature">
                             <div class="layer-icon">🌧️</div>
-                            <div class="layer-name">Nature</div>
-                            <input type="range" class="volume-slider" id="natureVolume" 
-                                   min="0" max="100" value="50" orient="vertical">
-                            <div class="volume-label" id="natureLabel">50%</div>
-                            <button class="layer-mute" onclick="toggleMute('nature')">Mute</button>
+                            <div class="layer-name">Rain & Thunder</div>
+                            <div class="layer-volume-control">
+                                <input type="range" class="layer-volume-slider" 
+                                       id="natureVolume" min="0" max="100" value="50">
+                                <div class="volume-display" id="natureLabel">50%</div>
+                            </div>
+                            <button class="layer-toggle" onclick="toggleLayer('nature')">Mute</button>
                         </div>
 
                         <!-- Binaural Layer -->
-                        <div class="layer-control">
+                        <div class="layer-control" data-layer="binaural">
                             <div class="layer-icon">🎧</div>
-                            <div class="layer-name">Binaural</div>
-                            <input type="range" class="volume-slider" id="binauralVolume" 
-                                   min="0" max="100" value="30" orient="vertical">
-                            <div class="volume-label" id="binauralLabel">30%</div>
-                            <button class="layer-mute" onclick="toggleMute('binaural')">Mute</button>
+                            <div class="layer-name">Delta Waves</div>
+                            <div class="layer-volume-control">
+                                <input type="range" class="layer-volume-slider" 
+                                       id="binauralVolume" min="0" max="100" value="30">
+                                <div class="volume-display" id="binauralLabel">30%</div>
+                            </div>
+                            <button class="layer-toggle" onclick="toggleLayer('binaural')">Mute</button>
                         </div>
 
                         <!-- Harmonic Layer -->
-                        <div class="layer-control">
+                        <div class="layer-control" data-layer="harmonic">
                             <div class="layer-icon">✨</div>
-                            <div class="layer-name">Harmonic</div>
-                            <input type="range" class="volume-slider" id="harmonicVolume" 
-                                   min="0" max="100" value="40" orient="vertical">
-                            <div class="volume-label" id="harmonicLabel">40%</div>
-                            <button class="layer-mute" onclick="toggleMute('harmonic')">Mute</button>
+                            <div class="layer-name">Harmony Pad</div>
+                            <div class="layer-volume-control">
+                                <input type="range" class="layer-volume-slider" 
+                                       id="harmonicVolume" min="0" max="100" value="40">
+                                <div class="volume-display" id="harmonicLabel">40%</div>
+                            </div>
+                            <button class="layer-toggle" onclick="toggleLayer('harmonic')">Mute</button>
                         </div>
                     </div>
 
@@ -628,12 +855,17 @@
                         <h3 style="color: var(--secondary); margin-bottom: 15px;">⏱️ Sleep Timer</h3>
                         <div class="timer-options">
                             <button class="timer-btn" onclick="setTimer(0)">Off</button>
-                            <button class="timer-btn" onclick="setTimer(15)">15 min</button>
-                            <button class="timer-btn" onclick="setTimer(30)">30 min</button>
-                            <button class="timer-btn" onclick="setTimer(60)">60 min</button>
-                            <button class="timer-btn" onclick="setTimer(90)">90 min</button>
+                            <button class="timer-btn" onclick="setTimer(15)">15m</button>
+                            <button class="timer-btn" onclick="setTimer(30)">30m</button>
+                            <button class="timer-btn" onclick="setTimer(60)">60m</button>
+                            <button class="timer-btn" onclick="setTimer(90)">90m</button>
                         </div>
                         <div class="timer-display" id="timerDisplay">Timer Off</div>
+                    </div>
+
+                    <!-- Audio Source Info -->
+                    <div class="audio-source-info">
+                        Using CDN-hosted therapeutic audio files optimised for tinnitus relief
                     </div>
                 </div>
             </div>
@@ -641,232 +873,582 @@
             <!-- Right Panel: Techniques -->
             <div class="techniques-panel">
                 <div class="card">
-                    <h2 class="card-title">🧘 Guided Techniques</h2>
+                    <h2 class="card-title">🧘 Sleep Techniques</h2>
                     
-                    <div class="technique-card" onclick="toggleVideo('assessment')">
-                        <div class="technique-title">📋 Self-Assessment Guide</div>
-                        <div class="technique-duration">2 minutes</div>
-                        <div class="video-container" id="assessmentVideo">
-                            <p style="color: var(--secondary); margin-bottom: 10px;">
-                                Learn how to accurately assess your tinnitus intensity
-                            </p>
-                            <iframe width="100%" height="200" 
-                                    src="https://www.youtube.com/embed/placeholder" 
-                                    frameborder="0" allowfullscreen></iframe>
-                        </div>
+                    <div class="technique-card" onclick="openTechnique('breathing')">
+                        <div class="technique-title">🫁 4-7-8 Breathing</div>
+                        <div class="technique-duration">Reduces anxiety in 3 minutes</div>
                     </div>
 
-                    <div class="technique-card" onclick="toggleVideo('pmr')">
+                    <div class="technique-card" onclick="openTechnique('pmr')">
                         <div class="technique-title">💪 Progressive Muscle Relaxation</div>
-                        <div class="technique-duration">3 minutes</div>
-                        <div class="video-container" id="pmrVideo">
-                            <p style="color: var(--secondary); margin-bottom: 10px;">
-                                Modified PMR technique for busy professionals
-                            </p>
-                            <iframe width="100%" height="200" 
-                                    src="https://www.youtube.com/embed/placeholder" 
-                                    frameborder="0" allowfullscreen></iframe>
-                        </div>
+                        <div class="technique-duration">Full body relaxation technique</div>
                     </div>
 
-                    <div class="technique-card" onclick="toggleVideo('cognitive')">
+                    <div class="technique-card" onclick="openTechnique('cognitive')">
                         <div class="technique-title">🧠 Cognitive Reframing</div>
-                        <div class="technique-duration">5 minutes</div>
-                        <div class="video-container" id="cognitiveVideo">
-                            <p style="color: var(--secondary); margin-bottom: 10px;">
-                                Evidence-based thought alternatives for better sleep
-                            </p>
-                            <iframe width="100%" height="200" 
-                                    src="https://www.youtube.com/embed/placeholder" 
-                                    frameborder="0" allowfullscreen></iframe>
-                        </div>
+                        <div class="technique-duration">Reduce tinnitus distress</div>
                     </div>
 
-                    <div class="technique-card" onclick="toggleVideo('protocol')">
-                        <div class="technique-title">🌙 Complete Evening Protocol</div>
-                        <div class="technique-duration">8 minutes</div>
-                        <div class="video-container" id="protocolVideo">
-                            <p style="color: var(--secondary); margin-bottom: 10px;">
-                                Your personalised bedtime routine
-                            </p>
-                            <iframe width="100%" height="200" 
-                                    src="https://www.youtube.com/embed/placeholder" 
-                                    frameborder="0" allowfullscreen></iframe>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Progress Tracker -->
-                <div class="card" style="margin-top: 20px;">
-                    <h2 class="card-title">📈 Session Stats</h2>
-                    <div style="padding: 10px; background: var(--light); border-radius: 8px;">
-                        <p><strong>Sessions Completed:</strong> <span id="sessionCount">0</span></p>
-                        <p><strong>Average Duration:</strong> <span id="avgDuration">0 min</span></p>
-                        <p><strong>Preferred Mix:</strong> <span id="prefMix">-</span></p>
-                        <p><strong>Improvement:</strong> <span id="improvement" style="color: var(--success);">-</span></p>
+                    <div class="technique-card" onclick="openTechnique('protocol')">
+                        <div class="technique-title">🌙 Complete Protocol</div>
+                        <div class="technique-duration">Your personalised routine</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Footer -->
-        <div style="text-align: center; padding: 20px; color: white;">
-            <p>© 2025 Tinnitus Centres | Evidence-based relief, nationwide</p>
-            <p style="margin-top: 10px;">
-                <a href="https://tinnituscentres.com/privacy-policy" style="color: white; margin: 0 10px;">Privacy Policy</a>
-                <a href="https://tinnituscentres.com/clinical-evidence" style="color: white; margin: 0 10px;">Clinical Evidence</a>
-                <a href="https://tinnituscentres.com/our-centres" style="color: white; margin: 0 10px;">Find Local Clinic</a>
+        <div style="text-align: center; padding: 30px 20px; color: white;">
+            <p style="font-size: 1.1em; margin-bottom: 10px;">
+                © 2025 Tinnitus Centres | Evidence-based relief, nationwide
+            </p>
+            <p style="opacity: 0.9;">
+                <a href="https://tinnituscentres.com/privacy" style="color: white; margin: 0 15px;">Privacy</a>
+                <a href="https://tinnituscentres.com/evidence" style="color: white; margin: 0 15px;">Clinical Evidence</a>
+                <a href="https://tinnituscentres.com/locations" style="color: white; margin: 0 15px;">Find a Centre</a>
             </p>
         </div>
     </div>
 
-    <!-- Sound Engine Script -->
+    <!-- Email Gate Modal -->
+    <div class="email-modal" id="emailModal" style="display: none;">
+        <div class="email-modal-content">
+            <img src="https://image.jimcdn.com/app/cms/image/transf/none/path/s960b7fc6030ac054/image/ia85c92eb1d04ab76/version/1648189187/image.png" 
+                 alt="Tinnitus Centres" 
+                 style="height: 40px; margin-bottom: 15px;">
+            <h2 style="color: var(--secondary); margin-bottom: 20px;">🌙 Unlock Sleep Timer</h2>
+            <p style="margin-bottom: 20px; color: #666;">
+                Enter your email to access the sleep timer and receive your personalised sound settings
+            </p>
+            <input type="email" id="timerEmail" class="form-input" 
+                   placeholder="your@email.com" required>
+            <input type="text" id="timerName" class="form-input" 
+                   placeholder="Your name (optional)" style="margin-top: 10px;">
+            <div class="modal-buttons">
+                <button onclick="submitTimerEmail()" class="submit-btn">
+                    Unlock Timer
+                </button>
+                <button onclick="closeEmailModal()" class="secondary-btn">
+                    Maybe Later
+                </button>
+            </div>
+            <p style="margin-top: 15px; font-size: 12px; color: #999;">
+                We'll send you your sound settings and sleep tips. No spam, ever.
+            </p>
+        </div>
+    </div>
+
+    <!-- Technique Video Modal -->
+    <div class="email-modal" id="techniqueModal" style="display: none;">
+        <div class="email-modal-content" style="max-width: 800px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 id="techniqueTitle" style="color: var(--secondary); margin: 0;">Technique Video</h2>
+                <button onclick="closeTechniqueModal()" 
+                        style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">✕</button>
+            </div>
+            <div id="techniqueVideoContainer"></div>
+            <p id="techniqueDescription" style="margin-top: 15px; color: #666; line-height: 1.6;"></p>
+        </div>
+    </div>
+
     <script>
-        // Configuration - Google Apps Script Web App URL
+        // Configuration
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyYvO-neuH5egvhoCvs0ygqpc5stBegMhPQhx9eSyXZAfYtcPBfxONzc2n8Gk8p7tYW/exec';
+        
+        // Audio file URLs - Using your GitHub-hosted files via jsDelivr CDN
+        const AUDIO_SOURCES = {
+            foundation: 'https://cdn.jsdelivr.net/gh/hungryfijian/quiet-nights-audio@main/pink-noise-432hz.mp3',
+            nature: 'https://cdn.jsdelivr.net/gh/hungryfijian/quiet-nights-audio@main/rain-thunder.mp3',
+            binaural: 'https://cdn.jsdelivr.net/gh/hungryfijian/quiet-nights-audio@main/delta-waves-3hz.mp3',
+            harmonic: 'https://cdn.jsdelivr.net/gh/hungryfijian/quiet-nights-audio@main/harmony-pad-c-major.mp3'
+        };
+
+        // Fallback to free audio sources if custom ones don't exist
+        const FALLBACK_SOURCES = {
+            foundation: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3',
+            nature: 'https://www.soundjay.com/nature/sounds/rain-03.mp3',
+            binaural: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3',
+            harmonic: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3'
+        };
 
         // Global variables
+        let audioLayers = {};
         let isPlaying = false;
         let sessionStartTime = null;
         let sessionTimer = null;
         let sleepTimer = null;
         let sleepTimerMinutes = 0;
-        let audioContext = null;
-        let soundLayers = {};
+        let fadeInterval = null;
+        let timerUnlocked = false;
 
         // Initialize on page load
-        window.addEventListener('load', async () => {
-            // Hide loading screen after a moment
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeAudioLayers();
+            setupEventListeners();
+            loadSavedPreferences();
+            startSessionTimer();
+            initializeVisualizer();
+            
+            // Check if timer was previously unlocked
+            if (localStorage.getItem('timerUnlocked')) {
+                timerUnlocked = true;
+            }
+            
+            // Hide loading screen
             setTimeout(() => {
                 document.getElementById('loadingScreen').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('loadingScreen').style.display = 'none';
                     document.getElementById('mainContainer').classList.add('loaded');
                 }, 500);
-            }, 1500);
-
-            // Initialize visualizer bars
-            const visualizer = document.getElementById('visualizer');
-            for (let i = 0; i < 30; i++) {
-                const bar = document.createElement('div');
-                bar.className = 'bar';
-                bar.style.height = '10px';
-                visualizer.appendChild(bar);
-            }
-
-            // Set up event listeners for sliders
-            setupSliderListeners();
-            
-            // Load saved preferences if any
-            loadSavedPreferences();
-
-            // Start session timer
-            startSessionTimer();
+            }, 1000);
         });
 
-        // Setup slider listeners for real-time updates
-        function setupSliderListeners() {
-            // Rating sliders
-            ['tinnitus', 'stress', 'sleep'].forEach(type => {
-                const slider = document.getElementById(`${type}Rating`);
-                const value = document.getElementById(`${type}Value`);
-                slider.addEventListener('input', () => {
-                    value.textContent = slider.value;
-                    updateRatingColor(value, slider.value);
+        // Initialize audio layers with HTML5 Audio
+        function initializeAudioLayers() {
+            const layers = ['foundation', 'nature', 'binaural', 'harmonic'];
+            
+            layers.forEach(layer => {
+                const audio = new Audio();
+                audio.loop = true;
+                audio.volume = 0.5;
+                audio.preload = 'auto';
+                
+                // Try primary source first
+                audio.src = AUDIO_SOURCES[layer];
+                
+                // Handle loading errors with fallback
+                audio.addEventListener('error', () => {
+                    console.warn(`Failed to load ${layer} audio, trying fallback...`);
+                    audio.src = FALLBACK_SOURCES[layer];
                 });
+                
+                audioLayers[layer] = {
+                    audio: audio,
+                    muted: false,
+                    volume: 0.5
+                };
             });
+        }
 
+        // Setup all event listeners
+        function setupEventListeners() {
             // Volume sliders
             ['foundation', 'nature', 'binaural', 'harmonic'].forEach(layer => {
                 const slider = document.getElementById(`${layer}Volume`);
                 const label = document.getElementById(`${layer}Label`);
+                
                 slider.addEventListener('input', () => {
-                    label.textContent = slider.value + '%';
-                    if (soundLayers[layer]) {
-                        updateLayerVolume(layer, slider.value);
-                    }
+                    const volume = parseInt(slider.value);
+                    label.textContent = volume + '%';
+                    setLayerVolume(layer, volume);
                 });
             });
 
             // Master volume
             const masterSlider = document.getElementById('masterVolume');
-            const masterValue = document.getElementById('masterVolumeValue');
+            
             masterSlider.addEventListener('input', () => {
-                masterValue.textContent = masterSlider.value + '%';
-                updateMasterVolume(masterSlider.value);
+                const volume = parseInt(masterSlider.value);
+                document.getElementById('masterVolumeValue').textContent = volume + '%';
+                setMasterVolume(volume);
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
+                    e.preventDefault();
+                    togglePlayback();
+                }
             });
         }
 
-        // Update rating color based on value
-        function updateRatingColor(element, value) {
-            if (value <= 3) {
-                element.style.background = 'var(--success)';
-            } else if (value <= 7) {
-                element.style.background = 'var(--warning)';
-            } else {
-                element.style.background = 'var(--danger)';
-            }
-        }
-
         // Toggle playback
-        async function togglePlayback() {
+        function togglePlayback() {
             const btn = document.getElementById('playBtn');
             const icon = document.getElementById('playIcon');
             
             if (!isPlaying) {
-                // Start audio
-                await startAudio();
+                // Start all audio layers
+                Object.values(audioLayers).forEach(layer => {
+                    if (!layer.muted) {
+                        layer.audio.play().catch(error => {
+                            console.error('Playback error:', error);
+                            showError('Unable to start audio. Please try again.');
+                        });
+                    }
+                });
+                
+                isPlaying = true;
                 btn.classList.add('playing');
                 icon.textContent = '⏸';
-                isPlaying = true;
                 startVisualization();
+                
             } else {
-                // Stop audio
-                stopAudio();
+                // Stop all audio layers
+                Object.values(audioLayers).forEach(layer => {
+                    layer.audio.pause();
+                });
+                
+                isPlaying = false;
                 btn.classList.remove('playing');
                 icon.textContent = '▶';
-                isPlaying = false;
                 stopVisualization();
             }
         }
 
-        // Start audio playback
-        async function startAudio() {
-            // Ensure Tone.js is started
-            await Tone.start();
+        // Toggle individual layer
+        function toggleLayer(layerName) {
+            const layer = audioLayers[layerName];
+            const btn = event.target;
+            const control = document.querySelector(`[data-layer="${layerName}"]`);
             
-            // Initialize audio context if not already
-            if (!audioContext) {
-                audioContext = Tone.context;
+            if (!layer.muted) {
+                // Mute layer
+                layer.muted = true;
+                layer.audio.pause();
+                btn.textContent = 'Unmute';
+                btn.classList.add('muted');
+                control.classList.add('muted');
+            } else {
+                // Unmute layer
+                layer.muted = false;
+                if (isPlaying) {
+                    layer.audio.play();
+                }
+                btn.textContent = 'Mute';
+                btn.classList.remove('muted');
+                control.classList.remove('muted');
             }
+        }
 
-            // Create sound layers
-            createSoundLayers();
-            
-            // Start all layers
-            Object.values(soundLayers).forEach(layer => {
-                if (layer.start) layer.start();
+        // Set layer volume
+        function setLayerVolume(layerName, volume) {
+            const normalizedVolume = volume / 100;
+            if (audioLayers[layerName]) {
+                audioLayers[layerName].volume = normalizedVolume;
+                audioLayers[layerName].audio.volume = normalizedVolume * (parseInt(document.getElementById('masterVolume').value) / 100);
+            }
+        }
+
+        // Enhanced volume control functions
+        function adjustMasterVolume(change) {
+            const slider = document.getElementById('masterVolume');
+            const currentValue = parseInt(slider.value);
+            const newValue = Math.max(0, Math.min(100, currentValue + change));
+            slider.value = newValue;
+            document.getElementById('masterVolumeValue').textContent = newValue + '%';
+            setMasterVolume(newValue);
+        }
+
+        function setMasterVolumePreset(value) {
+            const slider = document.getElementById('masterVolume');
+            slider.value = value;
+            document.getElementById('masterVolumeValue').textContent = value + '%';
+            setMasterVolume(value);
+        }
+
+        // Set master volume
+        function setMasterVolume(volume) {
+            const masterMultiplier = volume / 100;
+            Object.keys(audioLayers).forEach(layer => {
+                audioLayers[layer].audio.volume = audioLayers[layer].volume * masterMultiplier;
             });
         }
 
-        // Create sound layers
-        function createSoundLayers() {
-            // Foundation Layer - Pink Noise
-            const pinkNoise = new Tone.Noise("pink").toDestination();
-            const pinkFilter = new Tone.Filter({
-                frequency: 432,
-                type: "bandpass",
-                rolloff: -12,
-                Q: 1
-            });
-            pinkNoise.connect(pinkFilter);
-            pinkFilter.toDestination();
-            soundLayers.foundation = pinkNoise;
+        // Load preset configurations
+        function loadPreset(preset) {
+            const presets = {
+                gentle: { foundation: 60, nature: 70, binaural: 20, harmonic: 50 },
+                deep: { foundation: 80, nature: 40, binaural: 50, harmonic: 30 },
+                active: { foundation: 50, nature: 60, binaural: 10, harmonic: 70 },
+                custom: { foundation: 70, nature: 50, binaural: 30, harmonic: 40 }
+            };
 
-            // Nature Layer - Rain synthesis
-            const rainNoise = new Tone.Noise("white").toDestination();
-            const rainFilter = new Tone.AutoFilter({
-                frequency: "8n",
-                depth: 0.5
-            }).toDestination();
+            const settings = presets[preset];
+            Object.keys(settings).forEach(layer => {
+                const slider = document.getElementById(`${layer}Volume`);
+                const label = document.getElementById(`${layer}Label`);
+                slider.value = settings[layer];
+                label.textContent = settings[layer] + '%';
+                setLayerVolume(layer, settings[layer]);
+            });
+
+            // Update active preset button
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Email gate functionality
+        function setTimer(minutes) {
+            if (!timerUnlocked && minutes > 0) {
+                document.getElementById('emailModal').style.display = 'flex';
+                return;
+            }
             
+            sleepTimerMinutes = minutes;
+            const display = document.getElementById('timerDisplay');
+            
+            // Clear existing timer
+            if (sleepTimer) {
+                clearInterval(sleepTimer);
+                sleepTimer = null;
+            }
+            if (fadeInterval) {
+                clearInterval(fadeInterval);
+                fadeInterval = null;
+            }
+
+            // Update button states
+            document.querySelectorAll('.timer-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            if (minutes === 0) {
+                display.textContent = 'Timer Off';
+                return;
+            }
+
+            // Start countdown
+            let remainingSeconds = minutes * 60;
+            display.textContent = formatTime(remainingSeconds);
+
+            sleepTimer = setInterval(() => {
+                remainingSeconds--;
+                display.textContent = formatTime(remainingSeconds);
+
+                // Start fade out in last 30 seconds
+                if (remainingSeconds === 30 && isPlaying) {
+                    startFadeOut(30);
+                }
+
+                if (remainingSeconds <= 0) {
+                    clearInterval(sleepTimer);
+                    display.textContent = 'Session Complete';
+                    
+                    // Stop playback
+                    if (isPlaying) {
+                        togglePlayback();
+                    }
+                }
+            }, 1000);
+        }
+
+        // Submit timer email
+        async function submitTimerEmail() {
+            const email = document.getElementById('timerEmail').value;
+            if (!email) {
+                alert('Please enter your email address');
+                return;
+            }
+            
+            timerUnlocked = true;
+            localStorage.setItem('timerUnlocked', 'true');
+            localStorage.setItem('userEmail', email);
+            
+            const name = document.getElementById('timerName').value;
+            
+            // Collect session data
+            const sessionData = {
+                timestamp: new Date().toISOString(),
+                email: email,
+                name: name || 'Sleep Timer User',
+                timerUnlocked: true,
+                soundMix: {
+                    foundation: document.getElementById('foundationVolume').value,
+                    nature: document.getElementById('natureVolume').value,
+                    binaural: document.getElementById('binauralVolume').value,
+                    harmonic: document.getElementById('harmonicVolume').value,
+                },
+                referrer: document.referrer,
+                userAgent: navigator.userAgent
+            };
+            
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(sessionData)
+                });
+                
+                closeEmailModal();
+                alert('Timer unlocked! You can now use all timer features.');
+                
+            } catch (error) {
+                console.error('Error submitting email:', error);
+                closeEmailModal();
+                alert('Timer unlocked! You can now use all timer features.');
+            }
+        }
+
+        function closeEmailModal() {
+            document.getElementById('emailModal').style.display = 'none';
+        }
+
+        // Smooth fade out
+        function startFadeOut(seconds) {
+            const steps = seconds * 10; // 10 steps per second
+            const currentMaster = parseInt(document.getElementById('masterVolume').value);
+            const decrement = currentMaster / steps;
+            let currentVolume = currentMaster;
+
+            fadeInterval = setInterval(() => {
+                currentVolume -= decrement;
+                if (currentVolume <= 0) {
+                    currentVolume = 0;
+                    clearInterval(fadeInterval);
+                }
+                document.getElementById('masterVolume').value = currentVolume;
+                document.getElementById('masterVolumeValue').textContent = Math.round(currentVolume) + '%';
+                setMasterVolume(currentVolume);
+            }, 100);
+        }
+
+        // Initialize visualizer
+        function initializeVisualizer() {
+            const visualizer = document.getElementById('visualizer');
+            for (let i = 0; i < 40; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'visualizer-bar';
+                bar.style.height = '10px';
+                visualizer.appendChild(bar);
+            }
+        }
+
+        // Visualization animation
+        let visualizationFrame;
+        function startVisualization() {
+            const bars = document.querySelectorAll('.visualizer-bar');
+            
+            function animate() {
+                bars.forEach((bar, i) => {
+                    // Simple random visualization
+                    const height = Math.random() * 60 + 10;
+                    bar.style.height = height + 'px';
+                });
+                visualizationFrame = requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+
+        function stopVisualization() {
+            cancelAnimationFrame(visualizationFrame);
+            document.querySelectorAll('.visualizer-bar').forEach(bar => {
+                bar.style.height = '10px';
+            });
+        }
+
+        // Format time display
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Start session timer
+        function startSessionTimer() {
+            sessionStartTime = Date.now();
+            updateSessionTime();
+            sessionTimer = setInterval(updateSessionTime, 1000);
+        }
+
+        function updateSessionTime() {
+            const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
+            document.getElementById('sessionTime').textContent = formatTime(elapsed);
+        }
+
+        // Load saved preferences
+        function loadSavedPreferences() {
+            // Load previously saved email if exists
+            const savedEmail = localStorage.getItem('userEmail');
+            if (savedEmail && document.getElementById('timerEmail')) {
+                document.getElementById('timerEmail').value = savedEmail;
+            }
+        }
+
+        // Open technique (with video support)
+        function openTechnique(technique) {
+            const techniques = {
+                breathing: {
+                    title: '🫁 4-7-8 Breathing Technique',
+                    videoId: 'R3bP0KOPI4Y',
+                    description: 'The 4-7-8 breathing technique is a powerful relaxation method that activates your parasympathetic nervous system. Breathe in for 4 counts, hold for 7 counts, and breathe out for 8 counts. This pattern helps calm your mind and prepare your body for sleep. Practice this technique 2-3 times before bed for best results.'
+                },
+                pmr: {
+                    title: '💪 Progressive Muscle Relaxation',
+                    videoId: null, // Add video ID when available
+                    description: 'Progressive Muscle Relaxation involves systematically tensing and releasing each muscle group in your body. Start from your toes and work your way up to your head. This technique helps release physical tension that may be preventing sleep and is particularly effective for those who carry stress in their bodies.'
+                },
+                cognitive: {
+                    title: '🧠 Cognitive Reframing for Tinnitus',
+                    videoId: null, // Add video ID when available
+                    description: 'Cognitive Reframing helps you change how you think about and respond to your tinnitus. Instead of fighting the sound, learn to acknowledge it without emotional reaction. This technique involves noticing thoughts about your tinnitus and gently redirecting focus to the pleasant aspects of your chosen therapeutic sounds.'
+                },
+                protocol: {
+                    title: '🌙 Complete Sleep Protocol',
+                    videoId: null, // Add video ID when available
+                    description: 'The Complete Protocol combines all techniques in an optimal sequence: Start with 4-7-8 breathing to calm your nervous system, follow with progressive muscle relaxation to release physical tension, and finish with cognitive reframing to manage any tinnitus-related anxiety. This comprehensive approach addresses all aspects of sleep preparation.'
+                }
+            };
+            
+            const tech = techniques[technique];
+            
+            if (tech.videoId) {
+                // Open modal with video
+                document.getElementById('techniqueModal').style.display = 'flex';
+                document.getElementById('techniqueTitle').textContent = tech.title;
+                document.getElementById('techniqueDescription').textContent = tech.description;
+                
+                // Embed YouTube video
+                const videoContainer = document.getElementById('techniqueVideoContainer');
+                videoContainer.innerHTML = `
+                    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+                        <iframe src="https://www.youtube.com/embed/${tech.videoId}" 
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
+                                title="${tech.title}"
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                `;
+            } else {
+                // Show alert for techniques without videos yet
+                alert(`${tech.title}\n\n${tech.description}\n\nVideo guide coming soon!`);
+            }
+        }
+
+        function closeTechniqueModal() {
+            document.getElementById('techniqueModal').style.display = 'none';
+            // Clear video to stop playback
+            document.getElementById('techniqueVideoContainer').innerHTML = '';
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+            setTimeout(() => {
+                errorEl.classList.remove('show');
+            }, 5000);
+        }
+
+        // Handle page visibility changes (pause when tab is hidden)
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && isPlaying) {
+                // Optional: pause when tab is hidden
+                // togglePlayback();
+            }
+        });
+    </script>
+</body>
+</html>
